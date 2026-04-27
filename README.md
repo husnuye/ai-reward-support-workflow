@@ -1,153 +1,200 @@
 # AI Reward Support Workflow
 
-This project demonstrates how an AI system can improve a real-world customer support workflow in a reward redemption system.
+## 🎥 Demo Video
 
-It focuses on handling common support cases such as missing vouchers, inactive campaigns, and user confusion.
+A short walkthrough of the system and design decisions:
+
+👉 [Watch the demo](https://www.loom.com/share/cb02fce687f94a7197533947cb525518)
+
+The video demonstrates the workflow, decision logic, and system behavior across different risk scenarios.
+
+## UI Preview
+
+
+![high-risk](high-risk-example.png)
+
+![medium-risk](medium-risk-example.png)
+---
+
+## Overview
+
+This project demonstrates how an AI-driven system can improve a real-world customer support workflow in a reward redemption environment.
+
+Rather than acting as a simple chatbot, the system is designed to understand context, retrieve real data, make decisions, and respond appropriately — while maintaining control through business rules.
 
 ---
 
-## Workflow Overview
+## Problem Overview
 
-Customers contact support when something goes wrong.
+Customer support teams frequently handle repetitive and time-sensitive issues such as:
 
-Typical issues include:
-- Missing voucher after balance deduction  
-- Campaign visible but not active  
-- User cannot find their voucher  
+- Missing vouchers after balance deduction  
+- Campaigns that appear active but are not redeemable  
+- Users unable to locate rewards  
 
-The goal is to:
-- Understand the request  
-- Check backend systems  
-- Decide the correct action  
-- Generate a clear response  
+These cases require:
+- Understanding user intent  
+- Validating backend data  
+- Making accurate decisions  
+- Providing clear responses  
+
+This project focuses on automating these workflows while maintaining reliability and control.
 
 ---
 
 ## System Design
 
-The system is built as a decision-making workflow, not a simple chatbot.
-
-It follows a structured flow:
+The system is structured as a modular decision-making workflow composed of multiple agents:
 
 1. **Intent Agent**  
-   Identifies the customer’s intent from the message  
+   Understands and identifies user intent from unstructured input
 
 2. **Router Agent**  
-   Decides which backend APIs or systems to use  
+   Determines which backend systems or APIs should be called  
 
-3. **Backend API Calls**  
-   Fetches real data (balance, voucher, campaign)  
+3. **Data Layer (Backend APIs)**  
+   Retrieves real-time structured data such as:
+   - Balance transactions  
+   - Voucher records  
+   - Campaign status  
 
 4. **Risk Agent**  
-   Evaluates the risk level of the case  
+   Evaluates the risk level of the case based on data consistency and business rules  
 
 5. **Response Agent**  
-   Generates a clear and professional response  
+   Generates a clear, user-facing response based on the decision outcome  
+
+This flow ensures that reasoning is grounded in data rather than purely language generation.
 
 ---
 
-## Data
+## Data Handling
 
-The system uses both structured and unstructured data.
+The system combines:
 
-- **Unstructured data**: customer message  
-- **Structured data**:  
-  - Balance transactions  
-  - Voucher records  
-  - Campaign status  
+- **Unstructured data** → customer messages  
+- **Structured data** → backend system records  
 
-All decisions are grounded in backend data.
+All decision-making logic is based on structured backend data.
+
+This improves reliability and ensures decisions are based on real data.
 
 ---
 
 ## Decision Logic
 
-The system does not rely on the LLM for decisions.
+Decision-making is rule-driven and separated from the LLM.
 
-Instead:
-- Rules + backend data determine outcomes  
-- Risk level drives system behavior  
+Risk classification determines system behavior:
 
-Risk levels:
-- **Low risk** → automated response  
-- **Medium risk** → response + flagged  
-- **High risk** → escalated to human support  
+- **Low Risk** → Fully automated response  
+- **Medium Risk** → Automated response + flagged for review  
+- **High Risk** → Escalation to human support  
 
----
-
-## Human in the Loop
-
-Human involvement is limited to high-risk scenarios.
-
-This ensures:
-- Safety in financial cases  
-- Efficiency in simple cases  
+This enables a balance between automation and safety.
 
 ---
 
-## LLM Role
+## Human-in-the-Loop Design
 
-The LLM is used only to generate responses.
+Human intervention is limited to high-risk scenarios.
+
+This approach:
+- Reduces operational load  
+- Maintains safety in sensitive cases  
+- Improves overall efficiency  
+
+---
+
+## Role of the LLM
+
+The LLM is used strictly for response generation.
 
 It does not:
 - Make decisions  
-- access business logic  
+- Execute business logic  
+- Access backend systems directly  
 
-This keeps the system reliable and controllable.
-
----
-
-## Tech Stack
-
-- Python  
-- Streamlit (UI)  
-- LLM API (response generation)  
-- Mock backend APIs  
+All critical decisions are handled by rules and structured data.
 
 ---
 
-## Production Vision
+## System Architecture (Production Vision)
 
-In a real-world system, this would connect to:
+In a production environment, this system would follow a modular architecture:
 
+- An orchestration layer manages workflow execution  
+- Backend services are accessed via APIs  
+- Each agent operates as an independent component  
+
+### Example integrations:
 - Reward platforms  
 - Voucher services  
 - Campaign engines  
 - CRM systems  
 
-The orchestration layer would handle:
-- API calls  
+### Responsibilities of the orchestration layer:
+- API coordination  
 - Data validation  
 - Error handling  
 - Logging and monitoring  
+
+This architecture ensures scalability, maintainability, and reliability.
+
+---
+
+## Tech Stack
+
+- Backend: Python  
+- UI: Streamlit  
+- LLM: OpenAI API (response generation)  
+- Data: Mock backend APIs  
 
 ---
 
 ## Business Impact
 
-This system provides clear business value:
+This system delivers measurable value:
 
-- Reduces support workload  
+- Reduces support workload through automation  
 - Improves response time  
-- Reduces operational cost  
-- Allows teams to focus on complex issues  
+- Lowers operational costs  
+- Allows teams to focus on complex, high-value cases  
 
 ---
 
-## Run the App
-
-To run the application locally:
+## Running the Application
 
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
+```
+
+---
 
 ## Environment Setup
 
-This project requires an API key to run.
+Create a `.env` file in the root directory:
 
-Create a `.env` file in the root directory and add:
-
+```env
 OPENAI_API_KEY=your_api_key_here
+```
 
-Make sure the `.env` file is not committed to version control.
+Ensure this file is excluded from version control.
+
+---
+
+## Future Improvements
+
+- Feedback loop for continuous improvement  
+- Monitoring and alerting system  
+- Integration with real-time data pipelines  
+- Advanced risk modeling  
+
+---
+
+## Summary
+
+This project demonstrates how AI systems can move beyond chat interfaces and operate as structured decision-making workflows — combining language understanding, data, and business logic.
+
+The result is a system that is both automated and controlled, making it suitable for real-world applications.

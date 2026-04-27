@@ -272,5 +272,12 @@
     "priority": "high",
     "reason": "Balance was deducted but voucher was not created.",
     "created_at": "2026-04-27T20:16:58.978794"
+  },
+  {
+    "ticket_id": "TCK-0041",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-04-27T23:00:49.318945"
   }
 ]
