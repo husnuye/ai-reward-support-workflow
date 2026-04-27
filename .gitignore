@@ -1,0 +1,19 @@
+# Environment variables (VERY IMPORTANT)
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environment (varsa)
+venv/
+.env/
+
+# MacOS files
+.DS_Store
+
+# Streamlit cache (opsiyonel)
+.streamlit/
+
+# Logs
+*.log
