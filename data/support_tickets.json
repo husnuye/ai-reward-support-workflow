@@ -279,5 +279,117 @@
     "priority": "high",
     "reason": "Balance was deducted but voucher was not created.",
     "created_at": "2026-04-27T23:00:49.318945"
+  },
+  {
+    "ticket_id": "TCK-0042",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-02T20:29:15.068316"
+  },
+  {
+    "ticket_id": "TCK-0043",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-02T21:24:46.909666"
+  },
+  {
+    "ticket_id": "TCK-0044",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-02T21:27:50.917281"
+  },
+  {
+    "ticket_id": "TCK-0045",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:38:57.989949"
+  },
+  {
+    "ticket_id": "TCK-0046",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:40:03.492849"
+  },
+  {
+    "ticket_id": "TCK-0047",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:40:44.067329"
+  },
+  {
+    "ticket_id": "TCK-0048",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:51:40.791673"
+  },
+  {
+    "ticket_id": "TCK-0049",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:53:00.856475"
+  },
+  {
+    "ticket_id": "TCK-0050",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:53:52.768692"
+  },
+  {
+    "ticket_id": "TCK-0051",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:55:13.877729"
+  },
+  {
+    "ticket_id": "TCK-0052",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:56:49.070032"
+  },
+  {
+    "ticket_id": "TCK-0053",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:58:08.523012"
+  },
+  {
+    "ticket_id": "TCK-0054",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:58:43.384161"
+  },
+  {
+    "ticket_id": "TCK-0055",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T07:59:42.100958"
+  },
+  {
+    "ticket_id": "TCK-0056",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T08:01:04.538693"
+  },
+  {
+    "ticket_id": "TCK-0057",
+    "customer_id": "C001",
+    "priority": "high",
+    "reason": "Balance was deducted but voucher was not created.",
+    "created_at": "2026-05-03T08:16:06.919165"
   }
 ]

@@ -1,19 +1,26 @@
 # Environment variables (VERY IMPORTANT)
 .env
+.env.*
+!.env.example
 
-# Python cache
+# Python
 __pycache__/
 *.pyc
-
-# Virtual environment (varsa)
 venv/
-.env/
 
-# MacOS files
+# Node / Playwright
+node_modules/
+test-results/
+.playwright-mcp/
+
+# OS
 .DS_Store
 
-# Streamlit cache (opsiyonel)
+# Streamlit (opsiyonel)
 .streamlit/
 
 # Logs
 *.log
+
+# Debug / temp
+debug*

@@ -1,9 +1,15 @@
 import streamlit as st
 import json
 from datetime import datetime
+import os
+from dotenv import load_dotenv
 
 from openai import OpenAI
-client = OpenAI()
+
+load_dotenv()
+# Use environment variable or a test key for development
+api_key = os.getenv("OPENAI_API_KEY", "sk-test-key-for-testing")
+client = OpenAI(api_key=api_key)
 # ============================================================
 # AI REWARD REDEMPTION SUPPORT WORKFLOW
 # ============================================================

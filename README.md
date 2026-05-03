@@ -167,7 +167,7 @@ This system delivers measurable value:
 
 ```bash
 pip install -r requirements.txt
-streamlit run app.py
+streamlit run app/main.py
 ```
 
 ---
@@ -198,3 +198,77 @@ Ensure this file is excluded from version control.
 This project demonstrates how AI systems can move beyond chat interfaces and operate as structured decision-making workflows — combining language understanding, data, and business logic.
 
 The result is a system that is both automated and controlled, making it suitable for real-world applications.
+
+---
+
+## 🤖 AI-Driven Testing Layer
+
+This project includes an AI-assisted testing workflow using Playwright and agent-based orchestration.
+
+### Workflow
+
+1. **Planner Agent**
+   - Explores the UI
+   - Generates a semantic test plan
+
+2. **Generator Agent**
+   - Converts the test plan into Playwright tests
+   - Uses stable selectors and semantic assertions
+
+3. **Healer Agent**
+   - Fixes failing tests (single-pass repair)
+   - Adjusts selectors and timing issues
+
+### Key Principles
+
+- Semantic validation (not exact LLM text matching)
+- Streamlit-aware selectors
+- Risk-based scenario coverage
+- End-to-end workflow validation
+
+
+### Test Execution
+
+```bash
+npx playwright test tests/generated/reward-support.spec.ts --headed
+```
+
+
+## 🏭 Production Considerations
+
+This project is a demo system. In a real production environment, the following would be added:
+
+### Reliability
+- Retry logic for API failures
+- Timeout and fallback handling
+- Circuit breaker patterns
+
+### Observability
+- Structured logging
+- Request tracing across agents
+- Metrics and monitoring (latency, failures)
+
+### Human-in-the-loop
+- High-risk cases require manual approval
+- Escalation workflows
+- Audit trail of decisions
+
+### Data & Integration
+- Replace mock JSON with real backend APIs
+- Database integration for tickets and history
+- Authentication & authorization
+
+### Agent Orchestration
+- Move from rule-based routing to hybrid LLM + rules
+- Introduce state management across agents
+- Add memory/context persistence
+
+---
+
+## 🚀 What This Demonstrates
+
+- AI-assisted system design
+- Multi-agent workflow orchestration
+- End-to-end test automation with Playwright
+- Semantic validation of AI outputs
+- Practical approach to building testable AI systems
