@@ -29,3 +29,4 @@ debug*
 # Local editor / agent config
 .codex/
 .vscode/
+playwright-report/
