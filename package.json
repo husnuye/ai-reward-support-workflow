@@ -7,7 +7,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:python": "OPENAI_API_KEY= SUPPORT_TICKET_PATH=/private/tmp/reward_support_test_tickets.json venv/bin/python -m unittest discover -s tests/unit -p 'test_*.py' && OPENAI_API_KEY= SUPPORT_TICKET_PATH=/private/tmp/reward_support_test_tickets.json venv/bin/python -m unittest discover -s tests/integration -p 'test_*.py'",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed"
   },
   "keywords": [],
   "author": "",

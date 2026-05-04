@@ -1,0 +1,23 @@
+[
+  {
+    "message": "My balance was deducted but voucher not created",
+    "scenario": "high_risk",
+    "expected_intent": "reward_issue",
+    "expected_risk": "high",
+    "expected_decision": "escalate_to_human"
+  },
+  {
+    "message": "I can't redeem the campaign",
+    "scenario": "medium_risk",
+    "expected_intent": "campaign_issue",
+    "expected_risk": "medium",
+    "expected_decision": "flag_for_review"
+  },
+  {
+    "message": "Where is my voucher?",
+    "scenario": "low_risk",
+    "expected_intent": "reward_issue",
+    "expected_risk": "low",
+    "expected_decision": "auto_respond"
+  }
+]
