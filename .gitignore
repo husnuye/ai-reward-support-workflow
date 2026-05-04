@@ -16,11 +16,17 @@ test-results/
 # OS
 .DS_Store
 
-# Streamlit (opsiyonel)
-.streamlit/
+# Streamlit
+# Keep .streamlit/config.toml tracked so the demo theme is deterministic.
+.streamlit/secrets.toml
 
 # Logs
 *.log
 
 # Debug / temp
 debug*
+
+# Local editor / agent config
+.codex/
+.vscode/
+playwright-report/

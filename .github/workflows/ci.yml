@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv venv
+          venv/bin/pip install -r requirements.txt
+
+      - name: Compile Python
+        run: venv/bin/python -m compileall app src evals
+
+      - name: Run Python unit and integration tests
+        run: |
+          OPENAI_API_KEY= SUPPORT_TICKET_PATH=/tmp/reward_support_ci_tickets.json \
+          venv/bin/python -m unittest discover -s tests/unit -p 'test_*.py'
+          OPENAI_API_KEY= SUPPORT_TICKET_PATH=/tmp/reward_support_ci_tickets.json \
+          venv/bin/python -m unittest discover -s tests/integration -p 'test_*.py'
+
+      - name: Run workflow eval
+        run: |
+          OPENAI_API_KEY= SUPPORT_TICKET_PATH=/tmp/reward_support_ci_tickets.json \
+          venv/bin/python evals/run_eval.py
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E
+        run: npm run test:e2e
