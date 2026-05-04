@@ -144,7 +144,6 @@ tests/e2e/
 
 docs/
   case-study.md                   Portfolio case study narrative
-  loom-script.md                  Five-minute walkthrough script
   prompting.md                    Prompt contracts and guardrails
   playwright-agent-prompts.md     Major prompts for quota-aware Playwright agent use
 
@@ -231,6 +230,5 @@ To move this from portfolio demo to production:
 ## Related Docs
 
 - [Case study](docs/case-study.md)
-- [Loom walkthrough script](docs/loom-script.md)
 - [Prompting and guardrails](docs/prompting.md)
 - [Major Playwright agent prompts](docs/playwright-agent-prompts.md)
