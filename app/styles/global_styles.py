@@ -22,16 +22,7 @@ def load_global_styles():
         }
 
         .app-header {
-            margin-bottom: 6px;
-        }
-
-        .app-kicker {
-            color: #60A5FA;
-            font-size: 11px;
-            font-weight: 850;
-            line-height: 1.35;
-            text-transform: uppercase;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
         .app-title {
@@ -213,7 +204,7 @@ def load_global_styles():
             font-size: 13px;
             line-height: 1.5;
             width: 100%;
-            max-height: 128px;
+            max-height: 118px;
             overflow-y: auto;
         }
 
@@ -240,7 +231,8 @@ def load_global_styles():
             grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 7px;
             margin-top: 10px;
-            margin-bottom: 10px;
+            margin-bottom: 18px;
+            padding-bottom: 4px;
         }
 
         .timeline-item {
@@ -249,7 +241,7 @@ def load_global_styles():
             border-radius: 8px;
             padding: 7px 9px;
             min-width: 0;
-            min-height: 50px;
+            min-height: 46px;
         }
 
         .timeline-step {

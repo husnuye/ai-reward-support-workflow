@@ -226,7 +226,6 @@ def render_app_header() -> None:
     st.markdown(
         (
             '<div class="app-header">'
-            '<div class="app-kicker">LangGraph Orchestrated Decisioning System</div>'
             '<div class="app-title">AI Support Decisioning Console</div>'
             "</div>"
         ),
