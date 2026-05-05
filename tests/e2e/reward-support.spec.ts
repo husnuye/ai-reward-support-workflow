@@ -15,7 +15,7 @@ test.describe('AI Support Triage Console', () => {
       intent: 'Reward Issue',
       risk: 'High',
       decision: 'Escalate To Human',
-      humanReview: 'Required',
+      humanReview: 'Review ticket created',
     });
     await app.expectEvidence([
       'balance api, voucher api',

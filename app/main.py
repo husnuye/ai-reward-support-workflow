@@ -20,6 +20,53 @@ st.set_page_config(
 )
 
 st.markdown(load_global_styles(), unsafe_allow_html=True)
+st.markdown(
+    """
+    <style>
+        .response-card {
+            max-height: 125px !important;
+            overflow-y: auto !important;
+        }
+
+        .summary-secondary {
+            color: #94A3B8 !important;
+            font-size: 10.5px !important;
+            font-weight: 650 !important;
+            margin-top: 3px !important;
+            line-height: 1.25 !important;
+            white-space: normal !important;
+        }
+
+        .data-signal-row {
+            display: flex !important;
+            align-items: center !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
+            margin: 0 0 8px 0 !important;
+        }
+
+        .data-signal-label {
+            color: #94A3B8 !important;
+            font-size: 10.5px !important;
+            font-weight: 850 !important;
+            text-transform: uppercase !important;
+            margin-right: 2px !important;
+        }
+
+        .data-signal-chip {
+            background: #0B1220 !important;
+            border: 1px solid #243244 !important;
+            border-radius: 999px !important;
+            color: #CBD5E1 !important;
+            font-size: 10.5px !important;
+            font-weight: 750 !important;
+            padding: 4px 8px !important;
+            white-space: nowrap !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 
 WORKFLOW_STEPS = [
@@ -94,6 +141,10 @@ def format_list(values: list[str] | None) -> str:
     return ", ".join(value.replace("_", " ") for value in values)
 
 
+def format_chip_value(value: str) -> str:
+    return str(value).replace("_", " ")
+
+
 def format_mode(value: str | None) -> str:
     return value if value in {"llm", "fallback"} else "not recorded"
 
@@ -126,6 +177,13 @@ def mode_label(value: str | None) -> str:
     return format_mode(value).upper()
 
 
+def fallback_label(value: bool | None) -> str:
+    if value is None:
+        return "Not run yet"
+
+    return "Active" if value else "Off"
+
+
 def review_status(result: dict | None) -> str:
     if result and result.get("requires_human_review"):
         return "Triggered"
@@ -145,7 +203,7 @@ def risk_class(risk: str | None) -> str:
 
 def build_timeline(result: dict) -> list[tuple[str, str]]:
     apis = format_list(result.get("required_apis"))
-    signals = format_list(result.get("risk_signals"))
+    signals = format_list(display_risk_signals(result))
     confidence = result.get("intent_confidence")
     confidence_display = f"{confidence:.2f}" if confidence is not None else "N/A"
     confidence_display = f"{confidence_display} {confidence_label(confidence)}"
@@ -205,21 +263,54 @@ def build_timeline(result: dict) -> list[tuple[str, str]]:
 
 
 def decision_explanation_items(result: dict) -> list[str]:
-    items = [format_value(signal) for signal in result.get("risk_signals", [])]
-    reason = result.get("decision_reason")
+    risk = result.get("risk_level")
+    signals = set(display_risk_signals(result))
 
-    if reason:
-        items.append(reason)
+    if risk == "high":
+        items = [
+            "Balance was deducted",
+            "Voucher was not generated",
+            "Transaction inconsistency detected",
+        ]
+    elif risk == "medium":
+        items = [
+            "Campaign is visible",
+            "Campaign is inactive",
+            "Display inconsistency detected",
+        ]
+    elif "voucher_found" in signals:
+        items = [
+            "Voucher exists",
+            "No backend inconsistency detected",
+            "Safe to auto-respond",
+        ]
+    else:
+        items = [format_value(signal) for signal in signals]
 
     if not items:
         items.append("Decision policy evaluated the available support context")
 
-    deduped = []
-    for item in items:
-        if item and item not in deduped:
-            deduped.append(item)
+    return items[:3]
 
-    return deduped[:3]
+
+def display_risk_signals(result: dict) -> list[str]:
+    signals = result.get("risk_signals") or []
+    if signals:
+        return signals
+
+    reason = (result.get("decision_reason") or "").lower()
+    inferred = []
+
+    if "balance" in reason and "deduct" in reason:
+        inferred.append("balance_deducted")
+
+    if "voucher" in reason and ("not generated" in reason or "missing" in reason):
+        inferred.append("voucher_missing")
+
+    if "inconsistency" in reason:
+        inferred.append("transaction_inconsistency")
+
+    return inferred
 
 
 def render_app_header() -> None:
@@ -302,6 +393,18 @@ def render_case_intake() -> None:
             st.session_state["workflow_result"] = result
 
 
+def render_system_details_shortcut() -> None:
+    st.markdown(
+        (
+            '<div class="details-shortcut">'
+            '<a href="#system-details">View System Details ↓</a>'
+            '<div>Evidence, observability, guardrails, and audit logs</div>'
+            "</div>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
 def render_summary_item(label: str, value: str, class_name: str = "") -> None:
     st.markdown(
         f"""
@@ -338,11 +441,46 @@ def render_decision_explanation(result: dict) -> None:
         f"<li>{item}</li>"
         for item in decision_explanation_items(result)
     )
+    apis = result.get("required_apis") or []
+    api_chips = "\n".join(
+        f'<span class="data-signal-chip">{api}</span>'
+        for api in apis
+    )
+    data_signals_html = ""
+    if api_chips:
+        data_signals_html = (
+            '<div class="reason-data-signals">'
+            '<span class="data-signal-label">Data signals</span>'
+            f"{api_chips}"
+            "</div>"
+        )
+
     st.markdown(
         (
             '<div class="reason-box">'
-            "<strong>Why</strong>"
+            "<strong>Decision rationale</strong>"
             f"<ul>{items_html}</ul>"
+            f"{data_signals_html}"
+            "</div>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
+def render_data_signal_chips(result: dict) -> None:
+    apis = result.get("required_apis") or []
+    if not apis:
+        return
+
+    chips_html = "\n".join(
+        f'<span class="data-signal-chip">{api}</span>'
+        for api in apis
+    )
+    st.markdown(
+        (
+            '<div class="data-signal-row">'
+            '<span class="data-signal-label">Data signals</span>'
+            f"{chips_html}"
             "</div>"
         ),
         unsafe_allow_html=True,
@@ -357,12 +495,50 @@ def render_review_ticket_link(result: dict) -> None:
     st.markdown(
         (
             '<div class="review-ticket-link">'
-            f'<span>{ticket["ticket_id"]} -> View ticket</span>'
-            f'<small>{ticket["assigned_queue"]} · {format_value(ticket["status"])}</small>'
+            f'<span>Review ticket: {ticket["ticket_id"]} -> View ticket</span>'
+            f'<small>{ticket["assigned_queue"]} &bull; {format_value(ticket["status"])}</small>'
             "</div>"
         ),
         unsafe_allow_html=True,
     )
+
+
+def risk_summary_secondary(risk: str | None) -> str:
+    if risk == "high":
+        return "Signals: financial mismatch"
+
+    if risk == "medium":
+        return "Signals: campaign mismatch"
+
+    if risk == "low":
+        return "Signals: clear"
+
+    return ""
+
+
+def decision_summary_secondary(risk: str | None) -> str:
+    if risk == "high":
+        return "Reason: Financial inconsistency detected"
+
+    if risk == "medium":
+        return "Reason: Campaign display issue"
+
+    if risk == "low":
+        return "Reason: No inconsistency detected"
+
+    return ""
+
+
+def human_review_summary(result: dict | None) -> tuple[str, str]:
+    if not result:
+        return "Not run yet", ""
+
+    if result.get("requires_human_review"):
+        ticket = result.get("review_ticket") or {}
+        status = format_value(ticket.get("status")) if ticket else "Pending Review"
+        return "Review ticket created", f"Status: {status}"
+
+    return "Not required", "Status: Clear"
 
 
 def render_agent_timeline(result: dict) -> None:
@@ -375,12 +551,12 @@ def render_agent_timeline(result: dict) -> None:
         )
         for step, detail in build_timeline(result)
     )
-    st.markdown(f'<div class="timeline">{timeline_html}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="agent-timeline-grid">{timeline_html}</div>', unsafe_allow_html=True)
 
 
 def render_agent_output(result: dict | None) -> None:
     with st.container(border=True):
-        st.markdown('<div class="section-title">Agent Decision + Human Response</div>', unsafe_allow_html=True)
+        st.markdown('<div class="section-title">AI Agent Decision + Human Response</div>', unsafe_allow_html=True)
         st.markdown(
             '<div class="section-caption">The first screen shows the operational decision and the answer a support agent can send.</div>',
             unsafe_allow_html=True,
@@ -395,6 +571,8 @@ def render_agent_output(result: dict | None) -> None:
                 '<div class="orchestration-strip">'
                 '<div class="orchestration-chip"><strong>Orchestration</strong>: LangGraph</div>'
                 f'<div class="orchestration-chip"><strong>Route</strong>: {route}</div>'
+                f'<div class="orchestration-chip"><strong>Trace</strong>: {"Live" if result else "Idle"}</div>'
+                f'<div class="orchestration-chip"><strong>Fallback</strong>: {fallback_label(result.get("fallback_used") if result else None)}</div>'
                 "</div>"
             ),
             unsafe_allow_html=True,
@@ -403,22 +581,25 @@ def render_agent_output(result: dict | None) -> None:
         intent = result.get("intent") if result else None
         risk = result.get("risk_level") if result else None
         decision = result.get("decision") if result else None
-        human_review = result.get("requires_human_review") if result else None
+        human_review_value, human_review_secondary = human_review_summary(result)
+        confidence = result.get("intent_confidence") if result else None
+        intent_secondary = f"Confidence: {confidence:.2f}" if confidence is not None else ""
 
         summary_items = [
-            ("Intent", format_value(intent), ""),
-            ("Risk", format_value(risk), risk_class(risk)),
-            ("Decision", format_value(decision), ""),
-            ("Human Review", format_value(human_review), ""),
+            ("Intent", format_value(intent), intent_secondary, ""),
+            ("Risk", format_value(risk), risk_summary_secondary(risk), risk_class(risk)),
+            ("Decision", format_value(decision), decision_summary_secondary(risk), ""),
+            ("Human Review", human_review_value, human_review_secondary, ""),
         ]
         summary_html = "\n".join(
             (
                 '<div class="summary-item">'
                 f'<div class="summary-label">{label}</div>'
                 f'<div class="summary-value {class_name}">{value}</div>'
+                f'<div class="summary-secondary">{secondary}</div>'
                 "</div>"
             )
-            for label, value, class_name in summary_items
+            for label, value, secondary, class_name in summary_items
         )
         st.markdown(f'<div class="summary-grid">{summary_html}</div>', unsafe_allow_html=True)
 
@@ -433,7 +614,6 @@ def render_agent_output(result: dict | None) -> None:
                 unsafe_allow_html=True,
             )
             render_review_ticket_link(result)
-            render_agent_timeline(result)
         else:
             st.markdown(
                 (
@@ -477,7 +657,7 @@ def render_backend_data(result: dict) -> None:
     if required_apis:
         st.markdown(f"**APIs called:** `{format_list(required_apis)}`")
 
-    risk_signals = result.get("risk_signals") or []
+    risk_signals = display_risk_signals(result)
     if risk_signals:
         st.markdown(f"**Risk signals:** `{format_list(risk_signals)}`")
 
@@ -486,8 +666,8 @@ def render_backend_data(result: dict) -> None:
         st.markdown("**Human review ticket**")
         st.json(review_ticket)
 
-    st.markdown("**Backend data**")
-    st.json(result.get("backend_data"))
+    with st.expander("Backend data", expanded=False):
+        st.json(result.get("backend_data"))
 
 
 def render_observability(result: dict) -> None:
@@ -545,6 +725,7 @@ def render_raw_audit_log(result: dict) -> None:
 
 def render_workflow_result(result: dict) -> None:
     st.markdown('<div class="detail-section">', unsafe_allow_html=True)
+    st.markdown('<div id="system-details"></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-title">System Details</div>', unsafe_allow_html=True)
     st.markdown(
         '<div class="section-caption">Open only the detail layer you need for debugging, audit, or demo walkthrough.</div>',
@@ -574,6 +755,7 @@ def main() -> None:
 
     with left_col:
         render_case_intake()
+        render_system_details_shortcut()
 
     with right_col:
         render_agent_output(st.session_state.get("workflow_result"))
