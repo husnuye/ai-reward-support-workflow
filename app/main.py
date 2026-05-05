@@ -31,6 +31,51 @@ WORKFLOW_STEPS = [
     ("Timeline", "Trace + latency"),
 ]
 
+UNSAFE_ERROR_PATTERNS = (
+    "api key",
+    "invalid_api_key",
+    "401",
+    "error code",
+)
+
+SAFE_LLM_FALLBACK_MESSAGE = "LLM unavailable, fallback used"
+
+
+def format_duration(duration: float | None) -> str:
+    if duration is None:
+        return "not recorded"
+
+    rounded = round(float(duration), 1)
+    return f"{rounded:.1f} ms"
+
+
+def sanitize_ui_message(message) -> str:
+    text = str(message)
+    lowered = text.lower()
+
+    if any(pattern in lowered for pattern in UNSAFE_ERROR_PATTERNS):
+        return SAFE_LLM_FALLBACK_MESSAGE
+
+    if "llm" in lowered and "fallback" in lowered and "failed" in lowered:
+        return "LLM unavailable, fallback classifier used"
+
+    return text
+
+
+def sanitize_audit_event(event: dict) -> dict:
+    sanitized = dict(event)
+    if "message" in sanitized:
+        sanitized["message"] = sanitize_ui_message(sanitized["message"])
+
+    return sanitized
+
+
+def sanitized_audit_log(result: dict) -> list[dict]:
+    return [
+        sanitize_audit_event(event)
+        for event in result.get("audit_log", [])
+    ]
+
 
 def format_value(value) -> str:
     if value is None:
@@ -77,6 +122,20 @@ def step_durations(result: dict) -> dict[str, float]:
     return durations
 
 
+def mode_label(value: str | None) -> str:
+    return format_mode(value).upper()
+
+
+def review_status(result: dict | None) -> str:
+    if result and result.get("requires_human_review"):
+        return "Triggered"
+
+    if result:
+        return "Not Required"
+
+    return "Not run yet"
+
+
 def risk_class(risk: str | None) -> str:
     if risk in {"low", "medium", "high"}:
         return f"risk-{risk}"
@@ -89,7 +148,7 @@ def build_timeline(result: dict) -> list[tuple[str, str]]:
     signals = format_list(result.get("risk_signals"))
     confidence = result.get("intent_confidence")
     confidence_display = f"{confidence:.2f}" if confidence is not None else "N/A"
-    confidence_display = f"{confidence_display} ({confidence_label(confidence)})"
+    confidence_display = f"{confidence_display} {confidence_label(confidence)}"
     durations = step_durations(result)
 
     def with_duration(step_name: str, detail: str) -> str:
@@ -97,26 +156,26 @@ def build_timeline(result: dict) -> list[tuple[str, str]]:
         if duration is None:
             return detail
 
-        return f"{detail} · {duration} ms"
+        return f"{detail} · {format_duration(duration)}"
 
     items = [
         (
-            "Intent Agent",
+            "Intent",
             with_duration(
                 "intent_agent",
-                f"{format_value(result.get('intent'))} · {confidence_display} confidence",
+                f"{format_value(result.get('intent'))} · {confidence_display}",
             ),
         ),
-        ("Data Agent", with_duration("data_agent", f"Called {apis}")),
+        ("Data", with_duration("data_agent", apis)),
         (
-            "Risk Agent",
+            "Risk",
             with_duration(
                 "risk_agent",
-                f"{format_value(result.get('risk_level'))} risk · signals: {signals}",
+                f"{format_value(result.get('risk_level'))} · {signals}",
             ),
         ),
         (
-            "Decision Agent",
+            "Decision",
             with_duration(
                 "decision_agent",
                 f"{format_value(result.get('decision'))} · {result.get('decision_reason')}",
@@ -128,32 +187,56 @@ def build_timeline(result: dict) -> list[tuple[str, str]]:
         ticket = result["review_ticket"]
         items.append(
             (
-                "Human Review Agent",
+                "Human Review",
                 with_duration(
                     "human_review_agent",
-                    f"Created {ticket['ticket_id']} in {ticket['assigned_queue']}",
+                    f"{ticket['ticket_id']} · {ticket['assigned_queue']}",
                 ),
             )
         )
 
     items.append(
         (
-            "Response Agent",
-            with_duration("response_agent", "Generated customer-facing response"),
+            "Response",
+            with_duration("response_agent", "Customer-facing draft generated"),
         )
     )
     return items
 
 
+def decision_explanation_items(result: dict) -> list[str]:
+    items = [format_value(signal) for signal in result.get("risk_signals", [])]
+    reason = result.get("decision_reason")
+
+    if reason:
+        items.append(reason)
+
+    if not items:
+        items.append("Decision policy evaluated the available support context")
+
+    deduped = []
+    for item in items:
+        if item and item not in deduped:
+            deduped.append(item)
+
+    return deduped[:3]
+
+
 def render_app_header() -> None:
     st.markdown(
-        '<div class="app-title">AI Support Triage Console</div>',
+        (
+            '<div class="app-header">'
+            '<div class="app-kicker">LangGraph Orchestrated Decisioning System</div>'
+            '<div class="app-title">AI Support Decisioning Console</div>'
+            "</div>"
+        ),
         unsafe_allow_html=True,
     )
     st.markdown(
         (
             '<div class="app-subtitle">'
-            "Reads a support message, checks reward data, decides risk, and drafts a grounded response."
+            "Turns customer messages and backend reward signals into explainable decisions, "
+            "human-in-the-loop review, and grounded support responses."
             "</div>"
         ),
         unsafe_allow_html=True,
@@ -232,6 +315,70 @@ def render_summary_item(label: str, value: str, class_name: str = "") -> None:
     )
 
 
+def render_status_badges(result: dict | None) -> None:
+    badges = [
+        ("Intent Mode", mode_label(result.get("intent_mode")) if result else "Not run yet"),
+        ("Response Mode", mode_label(result.get("response_mode")) if result else "Not run yet"),
+        ("Decision Engine", "Rules + Signals"),
+        ("Human Review", review_status(result)),
+    ]
+    badges_html = "\n".join(
+        (
+            '<div class="status-badge">'
+            f'<span class="status-label">{label}</span>'
+            f'<span class="status-value">{value}</span>'
+            "</div>"
+        )
+        for label, value in badges
+    )
+    st.markdown(f'<div class="status-badge-grid">{badges_html}</div>', unsafe_allow_html=True)
+
+
+def render_decision_explanation(result: dict) -> None:
+    items_html = "\n".join(
+        f"<li>{item}</li>"
+        for item in decision_explanation_items(result)
+    )
+    st.markdown(
+        (
+            '<div class="reason-box">'
+            "<strong>Why</strong>"
+            f"<ul>{items_html}</ul>"
+            "</div>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
+def render_review_ticket_link(result: dict) -> None:
+    ticket = result.get("review_ticket")
+    if not ticket:
+        return
+
+    st.markdown(
+        (
+            '<div class="review-ticket-link">'
+            f'<span>{ticket["ticket_id"]} -> View ticket</span>'
+            f'<small>{ticket["assigned_queue"]} · {format_value(ticket["status"])}</small>'
+            "</div>"
+        ),
+        unsafe_allow_html=True,
+    )
+
+
+def render_agent_timeline(result: dict) -> None:
+    timeline_html = "\n".join(
+        (
+            '<div class="timeline-item">'
+            f'<div class="timeline-step">{step}</div>'
+            f'<div class="timeline-detail">{detail}</div>'
+            "</div>"
+        )
+        for step, detail in build_timeline(result)
+    )
+    st.markdown(f'<div class="timeline">{timeline_html}</div>', unsafe_allow_html=True)
+
+
 def render_agent_output(result: dict | None) -> None:
     with st.container(border=True):
         st.markdown('<div class="section-title">Agent Decision + Human Response</div>', unsafe_allow_html=True)
@@ -277,33 +424,22 @@ def render_agent_output(result: dict | None) -> None:
         st.markdown(f'<div class="summary-grid">{summary_html}</div>', unsafe_allow_html=True)
 
         if result:
-            decision_reason = result.get("decision_reason")
-            if decision_reason:
-                st.markdown(
-                    f'<div class="reason-box"><strong>Why:</strong> {decision_reason}</div>',
-                    unsafe_allow_html=True,
-                )
+            render_decision_explanation(result)
 
             st.markdown(
-                f'<div class="response-card">{result["response"]}</div>',
+                (
+                    '<div class="response-label">Customer-facing response</div>'
+                    f'<div class="response-card">{result["response"]}</div>'
+                ),
                 unsafe_allow_html=True,
             )
-
-            timeline_html = "\n".join(
-                (
-                    '<div class="timeline-item">'
-                    f'<div class="timeline-step">{step}</div>'
-                    f'<div class="timeline-detail">{detail}</div>'
-                    "</div>"
-                )
-                for step, detail in build_timeline(result)
-            )
-            st.markdown(f'<div class="timeline">{timeline_html}</div>', unsafe_allow_html=True)
+            render_review_ticket_link(result)
+            render_agent_timeline(result)
         else:
             st.markdown(
                 (
                     '<div class="empty-response">'
-                    "Run the workflow to generate intent, risk, decision, human review status, response, and timeline."
+                    "Run the workflow to generate intent, risk, decision, human review status, and a grounded response."
                     "</div>"
                 ),
                 unsafe_allow_html=True,
@@ -377,30 +513,35 @@ def render_observability(result: dict) -> None:
 
     if result.get("errors"):
         st.error("Fallback was triggered")
-        st.json(result.get("errors"))
+        for error in result.get("errors", []):
+            st.markdown(f"- {sanitize_ui_message(error)}")
 
     st.markdown("**Readable Step Latency**")
+    st.caption("Latency values are rounded for readability.")
 
     for step_name, duration in step_durations(result).items():
-        st.markdown(f"- `{step_name}`: `{duration} ms`")
+        st.markdown(f"- `{step_name}`: `{format_duration(duration)}`")
 
 
 def render_raw_audit_log(result: dict) -> None:
     st.markdown("**Readable audit timeline**")
 
-    for event in result.get("audit_log", []):
+    for event in sanitized_audit_log(result):
         label = event["step"].replace("_", " ").title()
         duration = event.get("duration_ms")
         status = event.get("status", "completed")
+        message = sanitize_ui_message(event.get("message", ""))
         summary_parts = [f"**{label}**", f"`{status}`"]
 
         if duration is not None:
-            summary_parts.append(f"`{duration} ms`")
+            summary_parts.append(f"`{format_duration(duration)}`")
 
         st.markdown(" · ".join(summary_parts))
+        if message:
+            st.caption(message)
 
-    st.markdown("**Full raw audit payload**")
-    st.json(result.get("audit_log", []))
+    st.markdown("**Sanitized audit payload**")
+    st.json(sanitized_audit_log(result))
 
 
 def render_workflow_result(result: dict) -> None:
@@ -430,7 +571,7 @@ def main() -> None:
     render_app_header()
     render_workflow_bar()
 
-    left_col, right_col = st.columns([0.95, 1.25], gap="large")
+    left_col, right_col = st.columns([0.9, 1.35], gap="large")
 
     with left_col:
         render_case_intake()

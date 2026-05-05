@@ -15,25 +15,37 @@ def load_global_styles():
 
         .block-container {
             max-width: 1240px;
-            padding-top: 42px;
+            padding-top: 34px;
             padding-bottom: 36px;
             padding-left: 2.5rem;
             padding-right: 2.5rem;
         }
 
+        .app-header {
+            margin-bottom: 6px;
+        }
+
+        .app-kicker {
+            color: #60A5FA;
+            font-size: 11px;
+            font-weight: 850;
+            line-height: 1.35;
+            text-transform: uppercase;
+            margin-bottom: 3px;
+        }
+
         .app-title {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 850;
             color: #F9FAFB;
-            margin-bottom: 8px;
             line-height: 1.15;
         }
 
         .app-subtitle {
             font-size: 15px;
             color: #CBD5E1;
-            margin-bottom: 18px;
-            max-width: 760px;
+            margin-bottom: 14px;
+            max-width: 820px;
             line-height: 1.5;
             word-break: normal;
             overflow-wrap: normal;
@@ -66,9 +78,9 @@ def load_global_styles():
             background: #111827;
             border: 1px solid #243244;
             border-radius: 8px;
-            padding: 8px 10px;
+            padding: 7px 9px;
             min-width: 0;
-            min-height: 48px;
+            min-height: 42px;
         }
 
         .system-step-label {
@@ -93,7 +105,44 @@ def load_global_styles():
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 8px;
-            margin-bottom: 8px;
+            margin-bottom: 7px;
+        }
+
+        .status-badge-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 7px;
+            margin-bottom: 7px;
+        }
+
+        .status-badge {
+            background: #0B1220;
+            border: 1px solid #243244;
+            border-radius: 999px;
+            padding: 6px 9px;
+            min-width: 0;
+        }
+
+        .status-label {
+            color: #94A3B8;
+            font-size: 9.5px;
+            font-weight: 850;
+            text-transform: uppercase;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-value {
+            color: #E5E7EB;
+            font-size: 10.5px;
+            font-weight: 850;
+            display: block;
+            margin-top: 1px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .orchestration-strip {
@@ -122,7 +171,7 @@ def load_global_styles():
             background: #111827;
             border: 1px solid #243244;
             border-radius: 8px;
-            padding: 8px 10px;
+            padding: 7px 9px;
             min-width: 0;
         }
 
@@ -158,14 +207,22 @@ def load_global_styles():
         .response-card {
             background: #F8FAFC;
             color: #111827;
-            padding: 12px 14px;
+            padding: 13px 15px;
             border-radius: 8px;
             border: 1px solid #E5E7EB;
             font-size: 13px;
-            line-height: 1.45;
+            line-height: 1.5;
             width: 100%;
-            max-height: 150px;
+            max-height: 128px;
             overflow-y: auto;
+        }
+
+        .response-label {
+            color: #CBD5E1;
+            font-size: 11px;
+            font-weight: 850;
+            text-transform: uppercase;
+            margin: 8px 0 5px 0;
         }
 
         .empty-response {
@@ -180,28 +237,39 @@ def load_global_styles():
 
         .timeline {
             display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 7px;
             margin-top: 10px;
+            margin-bottom: 10px;
         }
 
         .timeline-item {
             background: #111827;
             border: 1px solid #243244;
             border-radius: 8px;
-            padding: 8px 10px;
+            padding: 7px 9px;
+            min-width: 0;
+            min-height: 50px;
         }
 
         .timeline-step {
             color: #F9FAFB;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 850;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .timeline-detail {
             color: #94A3B8;
-            font-size: 11px;
-            line-height: 1.4;
+            font-size: 10.5px;
+            line-height: 1.3;
             margin-top: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .guardrail-list {
@@ -242,9 +310,46 @@ def load_global_styles():
             color: #CBD5E1;
             padding: 8px 10px;
             border-radius: 6px;
+            font-size: 11.5px;
+            line-height: 1.35;
+            margin-bottom: 7px;
+        }
+
+        .reason-box strong {
+            color: #F9FAFB;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .reason-box ul {
+            margin: 0;
+            padding-left: 17px;
+        }
+
+        .reason-box li {
+            margin: 0;
+        }
+
+        .review-ticket-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            background: #0B1220;
+            border: 1px solid #2563EB;
+            border-radius: 8px;
+            color: #DBEAFE;
             font-size: 12px;
-            line-height: 1.45;
-            margin-bottom: 8px;
+            font-weight: 850;
+            padding: 7px 10px;
+            margin-top: 8px;
+        }
+
+        .review-ticket-link small {
+            color: #94A3B8;
+            font-size: 10.5px;
+            font-weight: 700;
+            white-space: nowrap;
         }
 
         .metric-card {
@@ -309,11 +414,21 @@ def load_global_styles():
         }
 
         div[data-testid="stVerticalBlockBorderWrapper"] > div {
-            padding: 14px 16px;
+            padding: 14px 16px 18px 16px;
         }
 
         div[data-testid="stSelectbox"] {
             margin-bottom: 4px;
+        }
+
+        @media (max-width: 900px) {
+            .system-strip,
+            .summary-grid,
+            .status-badge-grid,
+            .timeline,
+            .guardrail-list {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
     """

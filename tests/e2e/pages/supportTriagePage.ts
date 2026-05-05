@@ -9,7 +9,7 @@ export class SupportTriagePage {
 
   async goto() {
     await this.page.goto('/');
-    await expect(this.page.getByText('AI Support Triage Console')).toBeVisible();
+    await expect(this.page.getByText('AI Support Decisioning Console')).toBeVisible();
   }
 
   async chooseScenario(label: string) {
