@@ -1,4 +1,4 @@
-# AI Support Decisioning Console
+# AI Support Decisioning System
 
 Production-style AI workflow for customer support triage in a reward redemption business.
 
@@ -6,7 +6,11 @@ This project is designed as an AI Engineer / Prompt Engineer case study: it show
 
 ## What It Does
 
-![AI Support Decisioning Console](assets/ai-support-triage-console.png)
+![AI Support Decisioning System](assets/ai-support-triage-console.png)
+
+## Demo Video
+
+[Watch the 4-minute Loom walkthrough](https://www.loom.com/share/abdc7793d91243618d9bf5117a799bc6)
 
 The app handles common reward support cases:
 
