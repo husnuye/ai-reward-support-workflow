@@ -196,11 +196,11 @@ def load_global_styles():
         }
 
         .response-card {
-            background: #F8FAFC;
+            background: #F1F5F9;
             color: #111827;
             padding: 11px 14px;
             border-radius: 8px;
-            border: 1px solid #E5E7EB;
+            border: 1px solid #CBD5E1;
             font-size: 12.5px;
             line-height: 1.34;
             width: 100%;
@@ -210,10 +210,11 @@ def load_global_styles():
 
         .response-label {
             color: #CBD5E1;
-            font-size: 11px;
+            font-size: 12.5px;
             font-weight: 850;
             text-transform: uppercase;
-            margin: 6px 0 4px 0;
+            margin: 8px 0 5px 0;
+            letter-spacing: 0;
         }
 
         .empty-response {
@@ -221,9 +222,11 @@ def load_global_styles():
             border: 1px dashed #334155;
             border-radius: 8px;
             color: #94A3B8;
-            padding: 12px 14px;
-            font-size: 13px;
-            line-height: 1.45;
+            box-sizing: border-box;
+            margin: 0;
+            padding: 9px 12px;
+            font-size: 12.5px;
+            line-height: 1.3;
         }
 
         .timeline {
@@ -408,20 +411,21 @@ def load_global_styles():
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 10px;
+            gap: 12px;
             background: #0B1220;
             border: 1px solid #2563EB;
             border-radius: 8px;
             color: #DBEAFE;
-            font-size: 11.5px;
+            font-size: 12px;
             font-weight: 850;
-            padding: 6px 9px;
-            margin-top: 7px;
+            line-height: 1.3;
+            padding: 8px 10px;
+            margin-top: 9px;
         }
 
         .review-ticket-link small {
             color: #94A3B8;
-            font-size: 10.5px;
+            font-size: 11px;
             font-weight: 700;
             white-space: nowrap;
         }

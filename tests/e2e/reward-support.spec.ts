@@ -21,7 +21,7 @@ test.describe('AI Support Triage Console', () => {
       'balance api, voucher api',
       'balance deducted, voucher missing',
       'pending_review',
-      'reward_support_review',
+      'Reward Support Review',
     ]);
     await app.expectResponseFacts([
       'balance was deducted',

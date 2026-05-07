@@ -1,4 +1,4 @@
-# AI Support Triage Console
+# AI Support Decisioning Console
 
 Production-style AI workflow for customer support triage in a reward redemption business.
 
@@ -6,7 +6,7 @@ This project is designed as an AI Engineer / Prompt Engineer case study: it show
 
 ## What It Does
 
-![AI Support Triage Console](assets/ai-support-triage-console.png)
+![AI Support Decisioning Console](assets/ai-support-triage-console.png)
 
 The app handles common reward support cases:
 
@@ -24,6 +24,10 @@ Instead of letting the LLM make unsupported decisions, the system separates resp
 | Decision | Rules engine | Select the business action |
 | Response | LLM + fallback templates | Draft a clear customer-facing answer |
 | Human Review | Conditional LangGraph node | Keep sensitive or inconsistent cases in the loop |
+
+The main console is intentionally designed as a decisioning UI, not a chatbot screen. The first view shows the case intake, operational decision summary, decision rationale, backend data signals, a **Support Response** section, and a readable human review ticket bar such as `Review Ticket: REV-XXXX -> View Details`.
+
+Detailed technical evidence stays available below the main workflow through collapsed **System Details** sections for evidence, observability, guardrails, and sanitized audit logs.
 
 ## Why This Is Not Just A Chatbot
 
@@ -45,7 +49,7 @@ flowchart LR
     G -- "no" --> I["Auto/flag path"]
     H --> J["Response Agent<br/>LLM + fallback template"]
     I --> J
-    J --> K["Support agent ready response<br/>audit log + observability"]
+    J --> K["Support Response<br/>audit log + observability"]
 ```
 
 ## Workflow State
@@ -85,6 +89,7 @@ This makes the workflow inspectable, testable, and debuggable.
 - **Semantic assertions over brittle prose checks:** tests validate stable business facts instead of exact LLM wording.
 - **Fallback-first reliability:** the app remains usable when the LLM key is missing or model calls fail.
 - **Auditability as a product feature:** trace ID, risk signals, modes, review tickets, and audit logs are visible in the UI.
+- **Production UI language:** customer drafts are labeled **Support Response**, review tickets use readable labels, and backend details are discoverable without cluttering the main decision panel.
 
 ## Scenarios
 
@@ -208,7 +213,7 @@ In a real support operation, this system would make triage faster, cheaper, and 
 - low-risk voucher status cases can be answered automatically
 - medium-risk campaign issues can be flagged with evidence for ops teams
 - high-risk financial inconsistencies are escalated with a review ticket
-- support agents get a grounded draft response instead of writing from scratch
+- support agents get a grounded **Support Response** instead of writing from scratch
 - managers get auditability around why each decision was made
 
 The adoption path is practical because the system does not require replacing human agents. It reduces repetitive investigation work while keeping policy-sensitive cases in human review.

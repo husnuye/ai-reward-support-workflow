@@ -492,11 +492,12 @@ def render_review_ticket_link(result: dict) -> None:
     if not ticket:
         return
 
+    queue_label = format_value(ticket["assigned_queue"])
     st.markdown(
         (
             '<div class="review-ticket-link">'
-            f'<span>Review ticket: {ticket["ticket_id"]} -> View ticket</span>'
-            f'<small>{ticket["assigned_queue"]} &bull; {format_value(ticket["status"])}</small>'
+            f'<span>Review Ticket: {ticket["ticket_id"]} -> View Details</span>'
+            f'<small>{queue_label} &bull; {format_value(ticket["status"])}</small>'
             "</div>"
         ),
         unsafe_allow_html=True,
@@ -592,12 +593,14 @@ def render_agent_output(result: dict | None) -> None:
             ("Human Review", human_review_value, human_review_secondary, ""),
         ]
         summary_html = "\n".join(
-            (
-                '<div class="summary-item">'
-                f'<div class="summary-label">{label}</div>'
-                f'<div class="summary-value {class_name}">{value}</div>'
-                f'<div class="summary-secondary">{secondary}</div>'
-                "</div>"
+            "".join(
+                [
+                    '<div class="summary-item">',
+                    f'<div class="summary-label">{label}</div>',
+                    f'<div class="summary-value {class_name}">{value}</div>',
+                    f'<div class="summary-secondary">{secondary}</div>' if secondary else "",
+                    "</div>",
+                ]
             )
             for label, value, secondary, class_name in summary_items
         )
@@ -608,7 +611,7 @@ def render_agent_output(result: dict | None) -> None:
 
             st.markdown(
                 (
-                    '<div class="response-label">Customer-facing response</div>'
+                    '<div class="response-label">Support Response</div>'
                     f'<div class="response-card">{result["response"]}</div>'
                 ),
                 unsafe_allow_html=True,
@@ -618,7 +621,7 @@ def render_agent_output(result: dict | None) -> None:
             st.markdown(
                 (
                     '<div class="empty-response">'
-                    "Run the workflow to generate intent, risk, decision, human review status, and a grounded response."
+                    "Run the workflow to generate a decision and support response."
                     "</div>"
                 ),
                 unsafe_allow_html=True,
